@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Audio to Google Drive & Save User Data</title>
+  </head>
+  <body>
+    <h2>Upload Audio File</h2>
+    <input
+      type="text"
+      id="username"
+      placeholder="Enter your name"
+    /><br /><br />
+    <input type="email" id="email" placeholder="Enter your email" /><br /><br />
+    <input type="file" id="fileInput" accept="audio/*" /><br /><br />
+    <button onclick="uploadFile()">Upload</button>
+    <p id="status"></p>
+
+    <script>
+      async function uploadFile() {
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const fileInput = document.getElementById("fileInput");
+
+        if (!username || !email || !fileInput.files.length) {
+          alert("Please fill all fields and select an audio file.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("email", email);
+        formData.append("audio", fileInput.files[0]);
+
+        try {
+          document.getElementById("status").innerText = "Uploading...";
+          const response = await fetch("http://localhost:3000/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+
+          if (result.success) {
+            document.getElementById(
+              "status"
+            ).innerText = `File uploaded! ID: ${result.fileId}`;
+          } else {
+            document.getElementById("status").innerText = "Upload failed.";
+          }
+        } catch (error) {
+          document.getElementById("status").innerText = "Error uploading file.";
+        }
+      }
+    </script>
+  </body>
+</html>
